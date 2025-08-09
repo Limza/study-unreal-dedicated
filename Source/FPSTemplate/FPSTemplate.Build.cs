@@ -15,7 +15,7 @@ public class FPSTemplate : ModuleRules
 			"InputCore", 
 			"EnhancedInput", 
 			"PhysicsCore", 
-			"GameLiftServerSDK"
+			"DedicatedServers"
 		]);
 
 		PrivateDependencyModuleNames.AddRange([
