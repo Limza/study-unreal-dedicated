@@ -79,5 +79,4 @@ DerivedDataCache/*
 *.iml
 *.ipr
 *.iws
-Plugins/Developer/RiderLink/Binaries/
-Plugins/Developer/RiderLink/Intermediate/
+Plugins/Developer/RiderLink/
