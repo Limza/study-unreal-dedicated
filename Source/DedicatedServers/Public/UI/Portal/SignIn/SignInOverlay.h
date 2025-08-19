@@ -1,6 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
@@ -8,9 +6,7 @@
 
 class UPortalManager;
 class UJoinGame;
-/**
- * 
- */
+
 UCLASS()
 class DEDICATEDSERVERS_API USignInOverlay : public UUserWidget
 {
@@ -29,4 +25,10 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<UPortalManager> PortalManager;
+
+	UFUNCTION()
+	void OnJoinGameButtonClicked();
+
+	UFUNCTION()
+	void UpdateJoinGameStatusMessage(const FString& Message);
 };
