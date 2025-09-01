@@ -12,7 +12,7 @@ void UAPITestManager::ListFleets()
 	check(APIData);
 	const TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &UAPITestManager::ListFleets_Response);
-	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTag::GameSessionsAPI::ListFleets);
+	const FString APIUrl = APIData->GetAPIEndpoint(DedicatedServersTag::GameSessionsApi::ListFleets);
 	Request->SetURL(APIUrl);
 	Request->SetVerb(TEXT("GET"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
