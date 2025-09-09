@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include "GameplayTags/DedicatedServersTag.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/HTTP/HTTPRequestTypes.h"
 
 void UPortalManager::JoinGameSession()
@@ -29,6 +30,7 @@ void UPortalManager::FindOrCreateGameSession_Response(FHttpRequestPtr Request,
 	if (bWasSuccessful == false)
 	{
 		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessages::SomethingWentWrong, true);
+		return;
 	}
 
 	TSharedPtr<FJsonObject> JsonObject;
@@ -39,6 +41,7 @@ void UPortalManager::FindOrCreateGameSession_Response(FHttpRequestPtr Request,
 	if (ContainsErrors(JsonObject))
 	{
 		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessages::SomethingWentWrong, true);
+		return;
 	}
 
 	FDSGameSession GameSession;
@@ -113,5 +116,41 @@ void UPortalManager::TryCreatePlayerSession(const FString& PlayerId,
 void UPortalManager::CreatePlayerSession_Response(FHttpRequestPtr Request,
 	FHttpResponsePtr Response, bool bWasSuccessful)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Create Player Session Response Received"));
+	if (bWasSuccessful == false)
+	{
+		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessages::SomethingWentWrong, true);
+		return;
+	}
+
+	TSharedPtr<FJsonObject> JsonObject;
+	const TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	if (FJsonSerializer::Deserialize(JsonReader, JsonObject) == false)
+	{
+		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessages::SomethingWentWrong, true);
+		return;
+	}
+
+	if (ContainsErrors(JsonObject))
+	{
+		BroadcastJoinGameSessionMessage.Broadcast(HTTPStatusMessages::SomethingWentWrong, true);
+		return;
+	}
+	
+	FDSPlayerSession PlayerSession;
+	FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &PlayerSession);
+	PlayerSession.Dump();
+	
+	// 서버에 접속하기 전에 인풋 모드 변경
+	APlayerController* LocalPlayerController = GEngine->GetFirstLocalPlayerController(GetWorld());
+	if (IsValid(LocalPlayerController))
+	{
+		const FInputModeGameOnly InputModeData;
+		LocalPlayerController->SetInputMode(InputModeData);
+		LocalPlayerController->SetShowMouseCursor(false);
+	}
+	
+	// 서버 접속
+	const FString IpAndPort = PlayerSession.IpAddress + TEXT(":") + FString::FromInt(PlayerSession.Port);
+	const FName Address(*IpAndPort);
+	UGameplayStatics::OpenLevel(this, Address);
 }

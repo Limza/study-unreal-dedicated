@@ -4,6 +4,7 @@
 #include "JsonObjectConverter.h"
 #include "DedicatedServers/DedicatedServers.h"
 
+
 bool UHTTPRequestManager::ContainsErrors(TSharedPtr<FJsonObject> JsonObject)
 {
 	if (JsonObject->HasField(TEXT("errorType")) || JsonObject->HasField(TEXT("errorMessage")))
@@ -13,17 +14,30 @@ bool UHTTPRequestManager::ContainsErrors(TSharedPtr<FJsonObject> JsonObject)
 
 		UE_LOG(LogDedicatedServers, Error, TEXT("Error Type: %s"), *ErrorType);
 		UE_LOG(LogDedicatedServers, Error, TEXT("Error Message: %s"), *ErrorMessage);
-
+		
+		LogJsonObjectError(JsonObject);
+		
 		return true;
 	}
 	if (JsonObject->HasField(TEXT("$fault")))
 	{
 		FString ErrorType = JsonObject->HasField(TEXT("name")) ? JsonObject->GetStringField(TEXT("name")) : TEXT("Unknown Error");
 		UE_LOG(LogDedicatedServers, Error, TEXT("Error Type: %s"), *ErrorType);
+
+		LogJsonObjectError(JsonObject);
+		
 		return true;
 	}
 
 	return false;
+}
+
+void UHTTPRequestManager::LogJsonObjectError(TSharedPtr<FJsonObject> JsonObject)
+{
+	FString JsonString;
+	const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+	UE_LOG(LogDedicatedServers, Error, TEXT("JsonObject: %s"), *JsonString);
 }
 
 void UHTTPRequestManager::DumpMetaData(TSharedPtr<FJsonObject> JsonObject)

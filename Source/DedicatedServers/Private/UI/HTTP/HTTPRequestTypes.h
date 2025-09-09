@@ -64,7 +64,7 @@ struct FDSGameSession
 	GENERATED_BODY()
 
 	UPROPERTY()
-	double CreationTime{};
+	FString CreationTime{};
 
 	UPROPERTY()
 	FString CreatorId{};
@@ -118,7 +118,54 @@ struct FDSGameSession
 	FString StatusReason{};
 
 	UPROPERTY()
-	double TerminationTime{};
+	FString TerminationTime{};
+
+	void Dump() const;
+};
+
+
+// aws gamelift CreatePlayerSession API의 응답을 저장하는 구조체
+// https://docs.aws.amazon.com/ko_kr/gameliftservers/latest/apireference/API_CreatePlayerSession.html#API_CreatePlayerSession_ResponseSyntax
+USTRUCT()
+struct FDSPlayerSession
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString CreationTime{};
+
+	UPROPERTY()
+	FString DnsName{};
+
+	UPROPERTY()
+	FString FleetArn{};
+
+	UPROPERTY()
+	FString FleetId{};
+	
+	UPROPERTY()
+	FString GameSessionId{};
+
+	UPROPERTY()
+	FString IpAddress{};
+
+	UPROPERTY()
+	FString PlayerData{};
+
+	UPROPERTY()
+	FString PlayerId{};
+
+	UPROPERTY()
+	FString PlayerSessionId{};
+
+	UPROPERTY()
+	int32 Port{};
+
+	UPROPERTY()
+	FString Status{};
+
+	UPROPERTY()
+	FString TerminationTime{};
 
 	void Dump() const;
 };
